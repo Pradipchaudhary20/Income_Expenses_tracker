@@ -18,7 +18,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.sidebar-menu li a').click(function() {
+            $('.sub-menu').hide();
+            $('.sidebar-menu li a.main-menu').click(function() {
                 $(this).next('.sub-menu').slideToggle();
             });
         });
@@ -35,7 +36,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         <li><a href="add_category.php"><i class="fas fa-plus-circle"></i> Add Category</a></li>
         <li><a href="view_categories.php"><i class="fas fa-list"></i> View Category</a></li>
         <li>
-            <a href="javascript:void(0)"><i class="fas fa-money-bill-wave"></i> Income</a>
+            <a href="javascript:void(0)" class="main-menu"><i class="fas fa-money-bill-wave"></i> Income</a>
             <ul class="sub-menu">
                 <li><a href="add_income.php"><i class="fas fa-plus-circle"></i> Add Income</a></li>
                 <li><a href="view_income.php"><i class="fas fa-eye"></i> View Income</a></li>
@@ -44,21 +45,21 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
             </ul>
         </li>
         <li>
-            <a href="javascript:void(0)"><i class="fas fa-money-check-alt"></i> Expenses</a>
+            <a href="javascript:void(0)" class="main-menu"><i class="fas fa-money-check-alt"></i> Expenses</a>
             <ul class="sub-menu">
                 <li><a href="add_expense.php"><i class="fas fa-plus-circle"></i> Add Expense</a></li>
                 <li><a href="view_expenses.php"><i class="fas fa-eye"></i> View Expenses</a></li>
             </ul>
         </li>
         <li>
-            <a href="javascript:void(0)"><i class="fas fa-university"></i> Bank Account</a>
+            <a href="javascript:void(0)" class="main-menu"><i class="fas fa-university"></i> Bank Account</a>
             <ul class="sub-menu">
                 <li><a href="add_bank.php"><i class="fas fa-plus-circle"></i> Add Bank</a></li>
                 <li><a href="view_bank.php"><i class="fas fa-eye"></i> View Bank</a></li>
             </ul>
         </li>
         <li>
-            <a href="javascript:void(0)"><i class="fas fa-hand-holding-usd"></i> Loans</a>
+            <a href="javascript:void(0)" class="main-menu"><i class="fas fa-hand-holding-usd"></i> Loans</a>
             <ul class="sub-menu">
                 <li><a href="add_loan_to_pay.php"><i class="fas fa-plus-circle"></i> Loan To Pay</a></li>
                 <li><a href="view_loans_to_pay.php"><i class="fas fa-eye"></i> View Loans To Pay</a></li>
@@ -71,19 +72,19 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     </ul>
 </div>
 
-    <div class="main-content">
-        <header>
-            <div class="title">
-                <h1>Dashboard</h1>
-            </div>
-            <div class="user-info">
-                <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
-                <img src="profile.jpg" alt="Profile Picture">
-            </div>
-        </header>
-        <main>
-            <!-- Content goes here -->
-        </main>
-    </div>
+<div class="main-content">
+    <header>
+        <div class="title">
+            <h1>Dashboard</h1>
+        </div>
+        <div class="user-info">
+            <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
+            <img src="profile.jpg" alt="Profile Picture">
+        </div>
+    </header>
+    <main>
+        <!-- Content goes here -->
+    </main>
+</div>
 </body>
 </html>
