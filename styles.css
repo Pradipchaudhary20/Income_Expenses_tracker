@@ -99,10 +99,10 @@ header .user-info img {
 /* Form styles */
 .form-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: flex-start; /* Align the form to the left */
+    align-items: flex-start;
     height: calc(100vh - 80px); /* Adjust for header height */
-    padding: 20px;
+    padding: 20px; /* Adjust padding for some spacing */
 }
 
 form {

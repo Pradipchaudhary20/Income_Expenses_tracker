@@ -5,6 +5,24 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
 }
+
+include('db.php');
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $amount = $_POST['amount'];
+    $name = $_POST['name'];
+    $date = $_POST['date'];
+
+    $sql = "INSERT INTO money_to_get (amount, name, date) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("dss", $amount, $name, $date);
+
+    if ($stmt->execute()) {
+        header('Location: view_money_to_get.php');
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,17 +30,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Income Expense Tracker</title>
+    <title>Add Money To Get</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.sidebar-menu li a').click(function() {
-                $(this).next('.sub-menu').slideToggle();
-            });
-        });
-    </script>
 </head>
 <body>
 <div class="sidebar">
@@ -71,19 +80,30 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     </ul>
 </div>
 
-    <div class="main-content">
-        <header>
-            <div class="title">
-                <h1>Dashboard</h1>
-            </div>
-            <div class="user-info">
-                <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
-                <img src="profile.jpg" alt="Profile Picture">
-            </div>
-        </header>
-        <main>
-            <!-- Content goes here -->
-        </main>
+<div class="main-content">
+    <header>
+        <div class="title">
+            <h1>Add Money To Get</h1>
+        </div>
+        <div class="user-info">
+            <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
+            <img src="profile.jpg" alt="Profile Picture">
+        </div>
+    </header>
+    <div class="form-container">
+        <form method="POST" action="">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" required>
+            
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+            
+            <button type="submit">Add Money To Get</button>
+        </form>
     </div>
+</div>
 </body>
 </html>

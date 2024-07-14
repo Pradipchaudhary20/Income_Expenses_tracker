@@ -5,6 +5,43 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
 }
+
+include('db.php');
+
+if (!isset($_GET['id'])) {
+    header('Location: view_money_to_get.php');
+    exit;
+}
+
+$id = $_GET['id'];
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $amount = $_POST['amount'];
+    $name = $_POST['name'];
+    $date = $_POST['date'];
+
+    $sql = "UPDATE money_to_get SET amount = ?, name = ?, date = ? WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("dssi", $amount, $name, $date, $id);
+
+    if ($stmt->execute()) {
+        header('Location: view_money_to_get.php');
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+} else {
+    $sql = "SELECT * FROM money_to_get WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $record = $result->fetch_assoc();
+
+    if (!$record) {
+        header('Location: view_money_to_get.php');
+        exit;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,17 +49,8 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Income Expense Tracker</title>
+    <title>Edit Money To Get</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.sidebar-menu li a').click(function() {
-                $(this).next('.sub-menu').slideToggle();
-            });
-        });
-    </script>
 </head>
 <body>
 <div class="sidebar">
@@ -71,19 +99,30 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     </ul>
 </div>
 
-    <div class="main-content">
-        <header>
-            <div class="title">
-                <h1>Dashboard</h1>
-            </div>
-            <div class="user-info">
-                <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
-                <img src="profile.jpg" alt="Profile Picture">
-            </div>
-        </header>
-        <main>
-            <!-- Content goes here -->
-        </main>
+<div class="main-content">
+    <header>
+        <div class="title">
+            <h1>Edit Money To Get</h1>
+        </div>
+        <div class="user-info">
+            <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
+            <img src="profile.jpg" alt="Profile Picture">
+        </div>
+    </header>
+    <div class="form-container">
+        <form method="POST" action="">
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" value="<?php echo htmlspecialchars($record['amount']); ?>" required>
+            
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($record['name']); ?>" required>
+            
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($record['date']); ?>" required>
+            
+            <button type="submit">Update Money To Get</button>
+        </form>
     </div>
+</div>
 </body>
 </html>

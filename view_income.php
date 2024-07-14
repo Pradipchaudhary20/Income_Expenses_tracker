@@ -39,15 +39,13 @@ switch ($filter) {
 
 $query = "
     SELECT 
-        expenses.id,
-        expenses.amount, 
-        expenses.date, 
-        expenses.notes, 
-        bank_accounts.bank_name as bank_account, 
-        categories.name as category
-    FROM expenses
-    JOIN bank_accounts ON expenses.bank_account_id = bank_accounts.id
-    JOIN categories ON expenses.category_id = categories.id
+        income.id,
+        income.amount, 
+        income.date, 
+        income.notes, 
+        bank_accounts.bank_name as bank_account 
+    FROM income
+    JOIN bank_accounts ON income.bank_account_id = bank_accounts.id
     $whereClause
 ";
 $result = mysqli_query($conn, $query);
@@ -58,7 +56,7 @@ $result = mysqli_query($conn, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Expenses</title>
+    <title>View Income</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -118,7 +116,7 @@ $result = mysqli_query($conn, $query);
 <div class="main-content">
     <header>
         <div class="title">
-            <h1>View Expenses</h1>
+            <h1>View Income</h1>
         </div>
         <div class="user-info">
             <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
@@ -152,7 +150,6 @@ $result = mysqli_query($conn, $query);
                     <tr>
                         <th>Amount</th>
                         <th>Date</th>
-                        <th>Category</th>
                         <th>Notes</th>
                         <th>Bank Account</th>
                         <th>Actions</th>
@@ -163,12 +160,11 @@ $result = mysqli_query($conn, $query);
                     <tr>
                         <td>Rs <?php echo number_format($row['amount'], 2); ?></td>
                         <td><?php echo htmlspecialchars($row['date']); ?></td>
-                        <td><?php echo htmlspecialchars($row['category']); ?></td>
                         <td><?php echo htmlspecialchars($row['notes']); ?></td>
                         <td><?php echo htmlspecialchars($row['bank_account']); ?></td>
                         <td>
-                            <a href="edit_expense.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Edit</a>
-                            <a href="delete_expense.php?id=<?php echo $row['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this expense?');">Delete</a>
+                            <a href="edit_income.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Edit</a>
+                            <a href="delete_income.php?id=<?php echo $row['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this income?');">Delete</a>
                         </td>
                     </tr>
                     <?php endwhile; ?>

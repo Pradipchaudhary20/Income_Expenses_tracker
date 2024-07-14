@@ -9,19 +9,20 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 include('db.php');
 
 if (isset($_GET['id'])) {
-    $id = intval($_GET['id']);
+    $id = $_GET['id'];
 
-    $sql = "DELETE FROM expenses WHERE id = ?";
-    $stmt = $conn->prepare($sql);
+    $query = "DELETE FROM income_categories WHERE id = ?";
+    $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $id);
 
     if ($stmt->execute()) {
-        header('Location: view_expenses.php');
+        header('Location: view_income_categories.php');
         exit;
     } else {
-        echo "Error deleting expense: " . $conn->error;
+        die("Error deleting category: " . $stmt->error);
     }
 } else {
-    echo "No expense ID provided.";
+    header('Location: view_income_categories.php');
+    exit;
 }
 ?>

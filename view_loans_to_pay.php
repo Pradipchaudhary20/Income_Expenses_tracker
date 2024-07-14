@@ -5,6 +5,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
 }
+
+include('db.php');
+
+$query = "SELECT * FROM loans_to_pay";
+$result = $conn->query($query);
 ?>
 
 <!DOCTYPE html>
@@ -12,7 +17,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Income Expense Tracker</title>
+    <title>View Loans To Pay</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -71,19 +76,43 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     </ul>
 </div>
 
-    <div class="main-content">
-        <header>
-            <div class="title">
-                <h1>Dashboard</h1>
-            </div>
-            <div class="user-info">
-                <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
-                <img src="profile.jpg" alt="Profile Picture">
-            </div>
-        </header>
-        <main>
-            <!-- Content goes here -->
-        </main>
-    </div>
+<div class="main-content">
+    <header>
+        <div class="title">
+            <h1>View Loans To Pay</h1>
+        </div>
+        <div class="user-info">
+            <p><?php echo htmlspecialchars($_SESSION['username']); ?></p>
+            <img src="profile.jpg" alt="Profile Picture">
+        </div>
+    </header>
+    <main>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td>Rs <?php echo number_format($row['amount'], 2); ?></td>
+                        <td><?php echo htmlspecialchars($row['name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['date']); ?></td>
+                        <td>
+                            <a href="edit_loan_to_pay.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Edit</a>
+                            <a href="delete_loan_to_pay.php?id=<?php echo $row['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this loan?');">Delete</a>
+                        </td>
+                    </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
 </body>
 </html>
