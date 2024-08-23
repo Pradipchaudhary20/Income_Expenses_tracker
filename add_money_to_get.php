@@ -12,12 +12,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $amount = $_POST['amount'];
     $name = $_POST['name'];
     $date = $_POST['date'];
+    $remarks = $_POST['remarks']; // New field for remarks
+    $performed_by = $_SESSION['username'];
 
-    $sql = "INSERT INTO money_to_get (amount, name, date) VALUES (?, ?, ?)";
+    // Insert the record into money_to_get table
+    $sql = "INSERT INTO money_to_get (amount, name, date, remarks) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("dss", $amount, $name, $date);
+
+    // Check if statement preparation was successful
+    if ($stmt === false) {
+        die('Prepare failed: ' . htmlspecialchars($conn->error));
+    }
+
+    $stmt->bind_param("dsss", $amount, $name, $date, $remarks);
 
     if ($stmt->execute()) {
+        $money_id = $stmt->insert_id;
+
+        // Log the transaction
+        $action = 'Added';
+        $description = 'Added money to get with remarks: ' . $remarks;
+        $sql_log = "INSERT INTO transactions (transaction_type, reference_id, action, amount, performed_by, description) 
+                    VALUES ('money_to_get', ?, ?, ?, ?, ?)";
+        $stmt_log = $conn->prepare($sql_log);
+
+        // Check if statement preparation was successful for logging
+        if ($stmt_log === false) {
+            die('Log prepare failed: ' . htmlspecialchars($conn->error));
+        }
+
+        $stmt_log->bind_param("isdss", $money_id, $action, $amount, $performed_by, $description);
+        $stmt_log->execute();
+
         header('Location: view_money_to_get.php');
     } else {
         echo "Error: " . $stmt->error;
@@ -27,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,7 +69,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
     });
     </script>
-
 </head>
 
 <body>
@@ -88,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <li><a href="view_loans_to_pay.php"><i class="fas fa-eye"></i> View Loans To Pay</a></li>
                     <li><a href="add_money_to_get.php"><i class="fas fa-plus-circle"></i> Money To Get</a></li>
                     <li><a href="view_money_to_get.php"><i class="fas fa-eye"></i> View Money To Get</a></li>
+                    <li><a href="view_money_transactions.php"><i class="fas fa-exchange-alt"></i> View Transactions</a></li>
                 </ul>
             </li>
             <li><a href="transactions.php"><i class="fas fa-exchange-alt"></i> Transactions</a></li>
@@ -114,6 +139,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <label for="date">Date:</label>
                 <input type="date" id="date" name="date" required>
+
+                <label for="remarks">Remarks:</label>
+                <textarea id="remarks" name="remarks" rows="4"></textarea>
 
                 <button type="submit">Add Money To Get</button>
             </form>
