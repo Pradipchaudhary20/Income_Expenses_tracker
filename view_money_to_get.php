@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Check if the user is logged in, otherwise redirect to login page
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: login.php');
     exit;
@@ -8,8 +9,14 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 include('db.php');
 
-$query = "SELECT * FROM money_to_get";
+// Fetch all entries in the money_to_get table, ordered by date in descending order
+$query = "SELECT * FROM money_to_get ORDER BY date DESC";
 $result = $conn->query($query);
+
+// Check if the query was successful
+if ($result === false) {
+    die('Query failed: ' . htmlspecialchars($conn->error));
+}
 ?>
 
 <!DOCTYPE html>
@@ -30,7 +37,6 @@ $result = $conn->query($query);
             });
         });
     </script>
-
 </head>
 <body>
 <div class="sidebar">
@@ -78,6 +84,7 @@ $result = $conn->query($query);
         <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
     </ul>
 </div>
+
 <div class="main-content">
     <header>
         <div class="title">
@@ -96,6 +103,7 @@ $result = $conn->query($query);
                         <th>Amount</th>
                         <th>Name</th>
                         <th>Date</th>
+                        <th>Remarks</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -105,6 +113,7 @@ $result = $conn->query($query);
                         <td>Rs <?php echo number_format($row['amount'], 2); ?></td>
                         <td><?php echo htmlspecialchars($row['name']); ?></td>
                         <td><?php echo htmlspecialchars($row['date']); ?></td>
+                        <td><?php echo htmlspecialchars($row['remarks']); ?></td>
                         <td>
                             <a href="edit_money_to_get.php?id=<?php echo $row['id']; ?>" class="btn btn-edit">Edit</a>
                             <a href="delete_money_to_get.php?id=<?php echo $row['id']; ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
@@ -118,3 +127,4 @@ $result = $conn->query($query);
 </div>
 </body>
 </html>
+
