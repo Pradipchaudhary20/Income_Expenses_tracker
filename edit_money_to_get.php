@@ -19,12 +19,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $amount = $_POST['amount'];
     $name = $_POST['name'];
     $date = $_POST['date'];
+    $remarks = $_POST['remarks'];
+    $performed_by = $_SESSION['username'];
 
-    $sql = "UPDATE money_to_get SET amount = ?, name = ?, date = ? WHERE id = ?";
+    $sql = "UPDATE money_to_get SET amount = ?, name = ?, date = ?, remarks = ? WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("dssi", $amount, $name, $date, $id);
+    $stmt->bind_param("dsssi", $amount, $name, $date, $remarks, $id);
 
     if ($stmt->execute()) {
+        // Log the transaction
+        $action = 'Updated';
+        $description = 'Updated money to get with remarks: ' . $remarks;
+        $sql_log = "INSERT INTO transactions (transaction_type, reference_id, action, amount, performed_by, description) 
+                    VALUES ('money_to_get', ?, ?, ?, ?, ?)";
+        $stmt_log = $conn->prepare($sql_log);
+
+        if ($stmt_log === false) {
+            die('Log prepare failed: ' . htmlspecialchars($conn->error));
+        }
+
+        $stmt_log->bind_param("isdss", $id, $action, $amount, $performed_by, $description);
+        $stmt_log->execute();
+
         header('Location: view_money_to_get.php');
     } else {
         echo "Error: " . $stmt->error;
@@ -46,7 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,7 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         });
     });
     </script>
-
 </head>
 
 <body>
@@ -137,6 +151,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="date">Date:</label>
                 <input type="date" id="date" name="date" value="<?php echo htmlspecialchars($record['date']); ?>"
                     required>
+
+                <label for="remarks">Remarks:</label>
+                <textarea id="remarks" name="remarks" required><?php echo htmlspecialchars($record['remarks']); ?></textarea>
 
                 <button type="submit">Update Money To Get</button>
             </form>
